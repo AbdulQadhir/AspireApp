@@ -48,5 +48,5 @@ Following technologies have been used:
 
 ## Notes to reviewers
 
-mockapi.io is used for api purposes
+mockapi.io is used for api purposes.
 Tokenisation is not implemented since there's no authorisation required in the app
