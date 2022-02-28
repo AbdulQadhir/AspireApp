@@ -1,7 +1,14 @@
-import React, {FC} from 'react';
+import React, {FC, useEffect, useState} from 'react';
 import {View, StyleSheet, Text, Dimensions} from 'react-native';
 import {Colors} from '../Theme';
 import {FontStyle, normalize} from '../Theme/Fonts';
+import Animated, {
+  useSharedValue,
+  withTiming,
+  useAnimatedStyle,
+  Easing,
+  withSpring,
+} from 'react-native-reanimated';
 
 interface Props {
   limit: number;
@@ -11,7 +18,24 @@ const {width} = Dimensions.get('window');
 
 const SpendingLimitIndicator: FC<Props> = props => {
   const used = 4500;
-  const progressWidth = 100; //(used / props.limit) * (width - normalize(30));
+
+  const progressWidth = useSharedValue(0);
+
+  const config = {
+    duration: 1000,
+    easing: Easing.ease,
+  };
+
+  const progressStyle = useAnimatedStyle(() => {
+    return {
+      width: progressWidth.value,
+    };
+  });
+
+  useEffect(() => {
+    const _width = (used / props.limit) * (width - normalize(30));
+    progressWidth.value = withTiming(_width, config);
+  }, [props.limit]);
 
   return (
     <View style={styles.container}>
@@ -25,7 +49,7 @@ const SpendingLimitIndicator: FC<Props> = props => {
         </Text>
       </View>
       <View style={styles.bgIndicator}>
-        <View style={[styles.progress, {width: progressWidth}]} />
+        <Animated.View style={[styles.progress, progressStyle]} />
       </View>
     </View>
   );
@@ -64,7 +88,7 @@ const styles = StyleSheet.create({
   progress: {
     position: 'absolute',
 
-    width: '30%',
+    width: 0,
     height: 0,
     backgroundColor: 'transparent',
     borderStyle: 'solid',
